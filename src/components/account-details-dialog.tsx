@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useMemo } from "react"
 import { Account, User } from "@/lib/types/account"
 import { UserRole } from "@/lib/types/roles"
 import {
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -24,7 +26,8 @@ import {
   Workflow,
   Edit,
   UserX,
-  AlertCircle
+  AlertCircle,
+  Search
 } from "lucide-react"
 
 interface AccountDetailsDialogProps {
@@ -46,10 +49,24 @@ export function AccountDetailsDialog({
   onSuspend,
   isStacked = false
 }: AccountDetailsDialogProps) {
-  if (!account) return null
+  const [teamSearchQuery, setTeamSearchQuery] = useState("")
 
   // Filter users belonging to this account
-  const accountUsers = users.filter(user => user.accountId === account.id)
+  const accountUsers = account ? users.filter(user => user.accountId === account.id) : []
+
+  // Filter users based on search query
+  const filteredTeamUsers = useMemo(() => {
+    if (!teamSearchQuery.trim()) return accountUsers
+    
+    const query = teamSearchQuery.toLowerCase()
+    return accountUsers.filter(user => 
+      user.name.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query) ||
+      user.role.toLowerCase().includes(query)
+    )
+  }, [accountUsers, teamSearchQuery])
+
+  if (!account) return null
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -130,7 +147,7 @@ export function AccountDetailsDialog({
             <TabsTrigger value="team">Team ({accountUsers.length})</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-6 mt-6 min-h-[500px]">
+          <TabsContent value="overview" className="space-y-4 mt-6 min-h-[400px]">
             {/* Account Overview */}
             <div>
               <h3 className="text-sm font-semibold text-zinc-900 mb-3">Account Overview</h3>
@@ -178,62 +195,47 @@ export function AccountDetailsDialog({
           {/* Seat Allocation by Role */}
           <div>
             <h3 className="text-sm font-semibold text-zinc-900 mb-3">Seat Allocation by Role</h3>
-            <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-3">
               {/* Admin Seats */}
-              <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <RoleBadge role="Admin" showIcon size="sm" />
-                  </div>
-                  <span className="text-sm font-semibold text-zinc-900">
-                    {account.seats.admin.used} / {account.seats.admin.total}
-                  </span>
+              <div className="p-3 bg-purple-50 rounded-lg border border-purple-100">
+                <div className="mb-2">
+                  <RoleBadge role="Admin" showIcon size="sm" />
+                </div>
+                <div className="text-lg font-bold text-zinc-900 mb-1.5">
+                  {account.seats.admin.used} / {account.seats.admin.total}
                 </div>
                 <Progress 
                   value={(account.seats.admin.used / account.seats.admin.total) * 100} 
-                  className="h-2 [&>div]:bg-purple-500" 
+                  className="h-1.5 [&>div]:bg-purple-500" 
                 />
-                <div className="text-xs text-purple-700 mt-1">
-                  {account.seats.admin.total - account.seats.admin.used} admin seats available
-                </div>
               </div>
 
               {/* Supervisor Seats */}
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <RoleBadge role="Supervisor" showIcon size="sm" />
-                  </div>
-                  <span className="text-sm font-semibold text-zinc-900">
-                    {account.seats.supervisor.used} / {account.seats.supervisor.total}
-                  </span>
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <div className="mb-2">
+                  <RoleBadge role="Supervisor" showIcon size="sm" />
+                </div>
+                <div className="text-lg font-bold text-zinc-900 mb-1.5">
+                  {account.seats.supervisor.used} / {account.seats.supervisor.total}
                 </div>
                 <Progress 
                   value={(account.seats.supervisor.used / account.seats.supervisor.total) * 100} 
-                  className="h-2 [&>div]:bg-blue-500" 
+                  className="h-1.5 [&>div]:bg-blue-500" 
                 />
-                <div className="text-xs text-blue-700 mt-1">
-                  {account.seats.supervisor.total - account.seats.supervisor.used} supervisor seats available
-                </div>
               </div>
 
               {/* Agent Seats */}
-              <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <RoleBadge role="Agent" showIcon size="sm" />
-                  </div>
-                  <span className="text-sm font-semibold text-zinc-900">
-                    {account.seats.agent.used} / {account.seats.agent.total}
-                  </span>
+              <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+                <div className="mb-2">
+                  <RoleBadge role="Agent" showIcon size="sm" />
+                </div>
+                <div className="text-lg font-bold text-zinc-900 mb-1.5">
+                  {account.seats.agent.used} / {account.seats.agent.total}
                 </div>
                 <Progress 
                   value={(account.seats.agent.used / account.seats.agent.total) * 100} 
-                  className="h-2 [&>div]:bg-green-500" 
+                  className="h-1.5 [&>div]:bg-green-500" 
                 />
-                <div className="text-xs text-green-700 mt-1">
-                  {account.seats.agent.total - account.seats.agent.used} agent seats available
-                </div>
               </div>
             </div>
           </div>
@@ -243,32 +245,27 @@ export function AccountDetailsDialog({
           {/* Usage & Performance */}
           <div>
             <h3 className="text-sm font-semibold text-zinc-900 mb-3">Usage & Performance</h3>
-            <div className="space-y-4">
-
+            <div className="grid grid-cols-2 gap-3">
               {/* Active Workflows */}
-              <div className="p-4 bg-zinc-50 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Workflow className="w-4 h-4 text-zinc-500" />
-                    <span className="text-sm font-medium text-zinc-900">Active Workflows</span>
-                  </div>
-                  <span className="text-lg font-bold text-zinc-900">
-                    {account.activeWorkflows}
-                  </span>
+              <div className="p-3 bg-zinc-50 rounded-lg">
+                <div className="flex items-center space-x-2 mb-1">
+                  <Workflow className="w-4 h-4 text-zinc-500" />
+                  <span className="text-xs text-zinc-600">Active Workflows</span>
                 </div>
+                <span className="text-xl font-bold text-zinc-900">
+                  {account.activeWorkflows}
+                </span>
               </div>
 
               {/* Conversations */}
-              <div className="p-4 bg-zinc-50 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <TrendingUp className="w-4 h-4 text-zinc-500" />
-                    <span className="text-sm font-medium text-zinc-900">Conversations This Month</span>
-                  </div>
-                  <span className="text-lg font-bold text-zinc-900">
-                    {account.conversationsThisMonth.toLocaleString()}
-                  </span>
+              <div className="p-3 bg-zinc-50 rounded-lg">
+                <div className="flex items-center space-x-2 mb-1">
+                  <TrendingUp className="w-4 h-4 text-zinc-500" />
+                  <span className="text-xs text-zinc-600">Conversations</span>
                 </div>
+                <span className="text-xl font-bold text-zinc-900">
+                  {account.conversationsThisMonth.toLocaleString()}
+                </span>
               </div>
             </div>
           </div>
@@ -290,32 +287,52 @@ export function AccountDetailsDialog({
             )}
           </TabsContent>
 
-          <TabsContent value="team" className="space-y-6 mt-6 min-h-[500px]">
+          <TabsContent value="team" className="space-y-4 mt-6 min-h-[400px]">
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+              <Input
+                type="text"
+                placeholder="Search team members by name, email, or role..."
+                value={teamSearchQuery}
+                onChange={(e) => setTeamSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
             {/* Users in This Account */}
             {accountUsers.length > 0 ? (
-              <div className="space-y-2">
-                {accountUsers.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-3 bg-zinc-50 rounded-lg hover:bg-zinc-100 transition-colors">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-[#5261FF] to-[#4A56E8] rounded-full flex items-center justify-center">
-                        <span className="text-white font-medium text-xs">{user.name.charAt(0)}</span>
+              filteredTeamUsers.length > 0 ? (
+                <div className="space-y-2">
+                  {filteredTeamUsers.map((user) => (
+                    <div key={user.id} className="flex items-center justify-between p-3 bg-zinc-50 rounded-lg hover:bg-zinc-100 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-gradient-to-r from-[#5261FF] to-[#4A56E8] rounded-full flex items-center justify-center">
+                          <span className="text-white font-medium text-xs">{user.name.charAt(0)}</span>
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-zinc-900">{user.name}</div>
+                          <div className="text-xs text-zinc-500">{user.email}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="text-sm font-medium text-zinc-900">{user.name}</div>
-                        <div className="text-xs text-zinc-500">{user.email}</div>
+                      <div className="flex items-center space-x-2">
+                        <RoleBadge role={user.role as UserRole} showIcon />
+                        {user.status !== "Active" && (
+                          <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100 text-xs">
+                            {user.status}
+                          </Badge>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RoleBadge role={user.role as UserRole} showIcon />
-                      {user.status !== "Active" && (
-                        <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100 text-xs">
-                          {user.status}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-zinc-500">
+                  <Search className="w-12 h-12 mx-auto mb-3 text-zinc-300" />
+                  <p className="text-sm font-medium">No users found</p>
+                  <p className="text-xs mt-1">No team members match your search criteria.</p>
+                </div>
+              )
             ) : (
               <div className="text-center py-12 text-zinc-500">
                 <Users className="w-12 h-12 mx-auto mb-3 text-zinc-300" />
