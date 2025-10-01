@@ -1,36 +1,167 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GenAssist Admin Dashboard - MVP
 
-## Getting Started
+A minimal, focused admin dashboard for managing GenAssist accounts and users. Built with Next.js, TypeScript, and Tailwind CSS.
 
-First, run the development server:
+## 🎯 Current Status: MVP (Minimum Viable Product)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+This is a **simplified, UI-only prototype** focused on core account management. The interface uses mock data and does not yet have backend integration.
+
+## ✨ Features (Current)
+
+### 📊 Dashboard
+- Overview of total accounts and users
+- Quick stats (active, suspended, pending)
+- Recent accounts list
+- Simple, clean interface
+
+### 👥 Account Management
+- View all accounts with detailed information
+- View all users across accounts
+- Filter by status (Active, Trial, Suspended)
+- Search functionality (UI ready)
+- Account details including:
+  - Plan type (Enterprise, Pro, Free)
+  - Seat usage
+  - Contact information
+  - Status tracking
+
+## 🛠 Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4
+- **UI Components**: shadcn/ui (Radix UI primitives)
+- **Icons**: Lucide React
+- **Design**: Minimal, Apple-style interface
+
+## 📁 Project Structure
+
+```
+genassist/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx              # Account Management (main page)
+│   │   ├── dashboard/
+│   │   │   └── page.tsx          # Dashboard with stats
+│   │   ├── layout.tsx            # Root layout
+│   │   └── globals.css           # Global styles
+│   ├── components/
+│   │   ├── layout/
+│   │   │   ├── root-layout.tsx   # Main layout wrapper
+│   │   │   └── sidebar.tsx       # Navigation sidebar
+│   │   └── ui/                   # Reusable UI components
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── input.tsx
+│   │       ├── table.tsx
+│   │       └── ... (other shadcn components)
+│   └── lib/
+│       └── utils.ts              # Utility functions
+├── public/                        # Static assets
+└── package.json                   # Dependencies
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Run development server**:
+   ```bash
+   npm run dev
+   ```
 
-## Learn More
+3. **Open in browser**:
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-To learn more about Next.js, take a look at the following resources:
+## 🎨 Design Principles
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Minimal & Clean**: Apple-style interface with plenty of white space
+- **Focus on Core**: Only essential features for account management
+- **Modern UI**: Using shadcn/ui components for consistency
+- **Mobile-First**: Responsive design that works on all devices
+- **Accent Color**: Primary accent `#5261FF` for key actions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📦 Current Data Model (Mock)
 
-## Deploy on Vercel
+### Account
+```typescript
+{
+  id: string
+  name: string
+  plan: "Enterprise" | "Pro" | "Free"
+  seatsUsed: number
+  seatsTotal: number
+  status: "Active" | "Trial" | "Suspended"
+  usage: number (percentage)
+  createdAt: string (ISO date)
+  contactEmail: string
+  nextRenewal: string (ISO date)
+  conversationsThisMonth: number
+  aiProvider: string
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### User
+```typescript
+{
+  id: string
+  name: string
+  email: string
+  role: "Admin" | "Agent" | "Supervisor"
+  accountId: string
+  accountName: string
+  status: "Active" | "Pending"
+  lastLogin: string (ISO timestamp)
+  ticketsHandled: number
+  conversationsProcessed: number
+}
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔄 Next Steps
+
+See [NEXT_STEPS.md](./NEXT_STEPS.md) for detailed guidance on:
+- Backend API implementation
+- Database schema design
+- Authentication & authorization
+- Feature roadmap (billing, analytics, security)
+
+## 🧹 What Was Removed
+
+This MVP version removed the following features that were too advanced for initial release:
+- ❌ Security & Compliance (audit logs, GDPR, incidents)
+- ❌ Billing & Payments (invoices, subscriptions, coupons)
+- ❌ Analytics & Usage Tracking
+- ❌ Product Configuration (feature flags, integrations, API keys)
+
+These features can be added back incrementally as the product matures.
+
+## 📝 Development Notes
+
+### Mock Data
+All data is currently hardcoded in the components. Search for `mockData` to find these sections:
+- `/src/app/page.tsx` - Account and user data
+- `/src/app/dashboard/page.tsx` - Dashboard stats
+
+### UI Components
+Uses shadcn/ui components which are:
+- Fully customizable
+- Built on Radix UI primitives
+- Copy-paste into your project
+- No NPM package needed
+
+## 🤝 Contributing
+
+When building features:
+1. Start with the backend API first
+2. Replace mock data with real API calls
+3. Add proper error handling
+4. Implement loading states
+5. Add TypeScript types for all data
+
+## 📄 License
+
+This project is proprietary software for GenAssist internal use.
+# ga-admin
