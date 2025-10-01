@@ -19,7 +19,7 @@ import {
   Key
 } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { ChangePasswordDialog } from "@/components/change-password-dialog"
 
 // GenAssist Logo Component
@@ -49,6 +49,7 @@ function GenAssistLogo() {
 
 export default function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false)
 
   const navigation = [
@@ -57,8 +58,10 @@ export default function Sidebar() {
   ]
 
   const handleLogout = () => {
-    // TODO: Implement logout logic
-    console.log("Logging out...")
+    // Clear auth cookie
+    document.cookie = "auth-token=; path=/; max-age=0"
+    // Redirect to login
+    router.push("/login")
   }
 
   return (
