@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { AlertCircle, Trash2, UserX } from "lucide-react"
+import { AlertCircle, Trash2, UserX, Info } from "lucide-react"
 
 interface ConfirmDialogProps {
   isOpen: boolean
@@ -19,7 +19,7 @@ interface ConfirmDialogProps {
   title: string
   description: string
   confirmText: string
-  type?: "danger" | "warning"
+  type?: "danger" | "warning" | "info"
   isLoading?: boolean
   requireTextConfirmation?: boolean
   confirmationText?: string
@@ -39,6 +39,7 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   const [inputValue, setInputValue] = useState("")
   const isDanger = type === "danger"
+  const isInfo = type === "info"
   
   // Reset input when dialog opens/closes
   useEffect(() => {
@@ -51,20 +52,34 @@ export function ConfirmDialog({
     ? inputValue !== confirmationText || isLoading
     : isLoading
 
+  const getIconAndColor = () => {
+    if (isDanger) {
+      return (
+        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+          <Trash2 className="w-5 h-5 text-red-600" />
+        </div>
+      )
+    }
+    if (isInfo) {
+      return (
+        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+          <Info className="w-5 h-5 text-blue-600" />
+        </div>
+      )
+    }
+    return (
+      <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+        <UserX className="w-5 h-5 text-orange-600" />
+      </div>
+    )
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <div className="flex items-start space-x-3">
-            {isDanger ? (
-              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                <Trash2 className="w-5 h-5 text-red-600" />
-              </div>
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                <UserX className="w-5 h-5 text-orange-600" />
-              </div>
-            )}
+            {getIconAndColor()}
             <div className="flex-1">
               <DialogTitle className="text-lg">{title}</DialogTitle>
               <p className="text-sm text-zinc-600 mt-2">{description}</p>
@@ -108,9 +123,12 @@ export function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={isConfirmDisabled}
-            className={isDanger 
-              ? "bg-red-600 hover:bg-red-700 text-white" 
-              : "bg-orange-600 hover:bg-orange-700 text-white"
+            className={
+              isDanger 
+                ? "bg-red-600 hover:bg-red-700 text-white" 
+                : isInfo
+                ? "bg-[#5261FF] hover:bg-[#4A56E8] text-white"
+                : "bg-orange-600 hover:bg-orange-700 text-white"
             }
           >
             {isLoading ? "Processing..." : confirmText}

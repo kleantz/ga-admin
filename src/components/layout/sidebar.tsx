@@ -54,7 +54,7 @@ export default function Sidebar() {
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Accounts', href: '/', icon: Users },
+    { name: 'Accounts', href: '/accounts', icon: Users },
   ]
 
   const handleLogout = () => {
