@@ -7,7 +7,7 @@ export default function HomePage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Redirect to dashboard - middleware will handle unauthenticated users.
+    // Redirect to dashboard - middleware will handle unauthenticated users
     router.replace("/dashboard")
   }, [router])
 
